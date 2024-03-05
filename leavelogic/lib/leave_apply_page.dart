@@ -181,7 +181,7 @@ class _LeaveApplyPageState extends State<LeaveApplyPage> {
 
       // Make HTTP POST request to the Flask backend
       final response = await http.post(
-        Uri.parse('http://192.168.144.58:5000/api/apply-leave'),
+        Uri.parse('http://192.168.144.58:8000/api/apply-leave'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

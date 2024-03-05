@@ -17,7 +17,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(numberOfLeaveRequests: 5, remainingLeaves: 0),
-    LeaveHistoryDetailsWidget(),
+    LeaveHistory(),
     SettingsScreen(),
     ProfileScreen(),
     ChangePasswordScreen(),

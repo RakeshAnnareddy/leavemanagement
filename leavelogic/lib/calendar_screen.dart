@@ -1,98 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-// Model class for leave entry
-class LeaveEntry {
-  final String leaveType;
-  final String fromDate;
-  final String toDate;
-  final String status;
-
-  LeaveEntry({
-    required this.leaveType,
-    required this.fromDate,
-    required this.toDate,
-    required this.status,
-  });
+class LeaveHistory extends StatefulWidget {
+  @override
+  _LeaveHistoryState createState() => _LeaveHistoryState();
 }
 
-// Widget to display leave history details
-class LeaveHistoryDetailsWidget extends StatelessWidget {
-  final LeaveEntry leaveEntry;
-
-  LeaveHistoryDetailsWidget({required this.leaveEntry});
+class _LeaveHistoryState extends State<LeaveHistory> {
+  List<dynamic> leaveApplications = [];
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Leave Type: ${leaveEntry.leaveType}',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 5.0),
-          Text('From: ${leaveEntry.fromDate}'),
-          Text('To: ${leaveEntry.toDate}'),
-          SizedBox(height: 5.0),
-          Text('Status: ${leaveEntry.status}'),
-        ],
-      ),
-    );
+  void initState() {
+    super.initState();
+    fetchData();
   }
-}
 
-// Main widget
-class MyApp extends StatelessWidget {
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('http://192.168.144.58:8000/api/get-details'));
+    if (response.statusCode == 200) {
+      setState(() {
+        leaveApplications = json.decode(response.body)['leave_applications'];
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Sample leave entries
-    List<LeaveEntry> leaveEntries = [
-      LeaveEntry(
-        leaveType: 'Sick Leave',
-        fromDate: '2024-03-01',
-        toDate: '2024-03-03',
-        status: 'Approved',
-      ),
-      LeaveEntry(
-        leaveType: 'Vacation Leave',
-        fromDate: '2024-02-28',
-        toDate: '2024-03-02',
-        status: 'Pending',
-      ),
-      LeaveEntry(
-        leaveType: 'Personal Leave',
-        fromDate: '2024-02-25',
-        toDate: '2024-02-25',
-        status: 'Rejected',
-      ),
-    ];
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text('Leave History'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: leaveEntries
-                .map((leaveEntry) => LeaveHistoryDetailsWidget(
-                      leaveEntry: leaveEntry,
-                    ))
-                .toList(),
-          ),
-        ),
+        body: leaveApplications.isEmpty
+            ? Center(child: Text('No leaves are applied'))
+            : ListView.builder(
+                itemCount: leaveApplications.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          leaveApplications[index]['title'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(leaveApplications[index]['description']),
+                        // Add more fields as needed
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }
-}
-
-void main() {
-  runApp(MyApp());
 }
