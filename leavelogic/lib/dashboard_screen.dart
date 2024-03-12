@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:leavelogic/change_password_screen.dart';
 import 'home_screen.dart';
-import 'calendar_screen.dart';
+import 'leave_history.dart';
 import 'settings_screen.dart';
 import 'profile_screen.dart';
 
@@ -17,7 +17,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(numberOfLeaveRequests: 5, remainingLeaves: 0),
-    LeaveHistory(),
+    LeaveApplicationPage(),
     SettingsScreen(),
     ProfileScreen(),
     ChangePasswordScreen(),
